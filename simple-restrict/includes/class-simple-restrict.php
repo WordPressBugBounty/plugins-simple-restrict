@@ -28,7 +28,7 @@
  * @author     Awaken Solutions Inc. <info@awakensolutions.com>
  */
 class Simple_Restrict {
-	
+
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -70,13 +70,12 @@ class Simple_Restrict {
 	public function __construct() {
 
 		$this->simple_restrict = 'simple-restrict';
-		$this->version = '1.0.0';
+		$this->version         = '1.2.8';
 
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
-
 	}
 
 	/**
@@ -101,27 +100,26 @@ class Simple_Restrict {
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-simple-restrict-loader.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-simple-restrict-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-simple-restrict-i18n.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-simple-restrict-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-simple-restrict-admin.php';
+		require_once plugin_dir_path( __DIR__ ) . 'admin/class-simple-restrict-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-simple-restrict-public.php';
+		require_once plugin_dir_path( __DIR__ ) . 'public/class-simple-restrict-public.php';
 
 		$this->loader = new Simple_Restrict_Loader();
-
 	}
 
 	/**
@@ -137,8 +135,7 @@ class Simple_Restrict {
 
 		$plugin_i18n = new Simple_Restrict_i18n();
 
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
-
+		$this->loader->add_action( 'init', $plugin_i18n, 'load_plugin_textdomain' );
 	}
 
 	/**
@@ -168,19 +165,18 @@ class Simple_Restrict {
 		$this->loader->add_action( 'edit_user_profile', $plugin_admin, 'add_permission_checkboxes' );
 		$this->loader->add_action( 'personal_options_update', $plugin_admin, 'save_permission_checkboxes' );
 		$this->loader->add_action( 'edit_user_profile_update', $plugin_admin, 'save_permission_checkboxes' );
-		
+
 		// Add plugin settings menu
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'custom_admin_menu' );
 
-		// Register new admin settings with WordPress and add them to the settings page 
+		// Register new admin settings with WordPress and add them to the settings page
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'simple_restrict_admin_init' );
-		
+
 		$this->loader->add_action( 'manage_users_columns', $plugin_admin, 'add_permissions_column', 10, 1 );
 		$this->loader->add_action( 'manage_users_custom_column', $plugin_admin, 'show_permissions_column_content', 10, 3 );
 
 		$this->loader->add_action( 'user_new_form', $plugin_admin, 'user_new_form_function' );
 		$this->loader->add_action( 'user_register', $plugin_admin, 'save_custom_user_profile_fields' );
-
 	}
 
 	/**
@@ -199,13 +195,13 @@ class Simple_Restrict {
 
 		// Check permissions and restrict content if necessary (call with wp hook instead of init hook so we can access post ID for all pages including homepage)
 		$this->loader->add_action( 'wp', $plugin_public, 'restrict_content' );
-		
+
 		$this->loader->add_action( 'init', $plugin_public, 'get_taxonomy_terms_object_array' );
-		
+
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 		$this->loader->add_filter( 'rest_prepare_page', $plugin_public, 'rest_restrict', 30, 3 );
-
+		$this->loader->add_action( 'pre_get_posts', $plugin_public, 'posts_args_search', 90, 1 );
 	}
 
 	/**
@@ -247,5 +243,4 @@ class Simple_Restrict {
 	public function get_version() {
 		return $this->version;
 	}
-	
 }

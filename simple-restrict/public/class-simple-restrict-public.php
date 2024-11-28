@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The public-facing functionality of the plugin.
  *
@@ -46,8 +45,8 @@ class Simple_Restrict_Public {
 	/**
 	 * Initialize the class and set its properties.
 	 *
-	 * @param  string  $simple_restrict  The name of the plugin.
-	 * @param  string  $version          The version of this plugin.
+	 * @param  string $simple_restrict  The name of the plugin.
+	 * @param  string $version          The version of this plugin.
 	 *
 	 * @since    1.0.0
 	 */
@@ -106,13 +105,12 @@ class Simple_Restrict_Public {
 			'orderby'    => 'name',
 			'order'      => 'ASC',
 		);
-		//echo('taxonomy = '.$taxonomy);
 		$this->taxonomy_terms_object_array = get_terms( $taxonomy, $term_args );
 	}
 
-	//Also defined in class-simple-restrict-admin.php
+	// Also defined in class-simple-restrict-admin.php.
 	public function define_initial_variables() {
-		$this->generic_restricted_message = __( "Sorry, this content is restricted to users who are logged in with the correct permissions.", 'simple-restrict' );
+		$this->generic_restricted_message = __( 'Sorry, this content is restricted to users who are logged in with the correct permissions.', 'simple-restrict' );
 	}
 
 	public function display_message() {
@@ -126,83 +124,64 @@ class Simple_Restrict_Public {
 	}
 
 
-	// Restrict content of specific page(s)
+	/**
+	 * Restrict content of specific page(s).
+	 *
+	 * @param string $content The content of the page.
+	 * @return string
+	 */
 	public function restrict_content( $content ) {
-		// We must prefix 'simple-restrict' to all the user metas (to not conflict with WordPress existing metas)
-		$current_user_permissions          = array();  // User permissions will be prefixed by default
-		$current_page_permissions          = array();  // Page permissions are user-defined, so we prefix them manually in next array
-		$current_page_permissions_prefixed = array();  // This array will prefix each of the page permissions
+		// We must prefix 'simple-restrict' to all the user metas (to not conflict with WordPress existing metas).
+		$current_user_permissions          = array();  // User permissions will be prefixed by default.
+		$current_page_permissions          = array();  // Page permissions are user-defined, so we prefix them manually in next array.
+		$current_page_permissions_prefixed = array();  // This array will prefix each of the page permissions.
 
-		$postID = get_the_ID();
-		//echo('$postID' . $postID);
-
-		//echo("<br />Current page's permissions:<br />");
-		// Create an array of the current page's permissions
-		$page_terms_list = wp_get_post_terms( $postID, 'simple-restrict-permission', array( "fields" => "all" ) );
+		$post_id = get_the_ID();
+		// Create an array of the current page's permissions.
+		$page_terms_list = wp_get_post_terms( $post_id, 'simple-restrict-permission', array( 'fields' => 'all' ) );
 		foreach ( $page_terms_list as $current_term ) {
 			if ( ! in_array( $current_term->slug, $current_page_permissions, true ) ) {
 				$current_term_slug          = $current_term->slug;
 				$current_term_slug_prefixed = 'simple-restrict-' . $current_term_slug;
 				array_push( $current_page_permissions, $current_term->slug );
 				array_push( $current_page_permissions_prefixed, $current_term_slug_prefixed );
-				//print_r($current_page_permissions_prefixed);
 			}
 		}
-		// Debug 
-		/*
-		foreach($current_page_permissions as $current_page_permission) {
-			echo('Page permission: '.$current_page_permission.'<br />');
-		}
-		foreach($current_page_permissions_prefixed as $current_page_permission) {
-			echo('Page permission prefixed: '.$current_page_permission.'<br />');
-		}
-		*/
 
-		// If the page has no permissions required, show the content and don't bother checking user
+		// If the page has no permissions required, show the content and don't bother checking user.
 		if ( empty( $current_page_permissions ) ) {
 			return $content;
-			// Otherwise check the user to see if it's permissions match the page's permissions
+			// Otherwise check the user to see if it's permissions match the page's permissions.
 		} else {
-			//echo("<br />Current user's permissions:<br />");
-			// Create an array of the current user's permissions by cycling through all possible page permissions and putting any matches into user permissions array
+			// Create an array of the current user's permissions by cycling through all possible page permissions and putting any matches into user permissions array.
 			$current_user_id = get_current_user_id();
-			//echo('$current_user_id: ' . $current_user_id);			
-			// Only populate user permissions if this is a registered user, otherwise leave permissions array empty
+			// Only populate user permissions if this is a registered user, otherwise leave permissions array empty.
 			if ( $current_user_id != 0 ) {
 				foreach ( $this->taxonomy_terms_object_array as $taxonomy_object ) {
 					$taxonomy_slug          = $taxonomy_object->slug;
 					$taxonomy_slug_prefixed = 'simple-restrict-' . $taxonomy_slug;
-					//echo('$taxonomy_slug_prefixed ' . $taxonomy_slug_prefixed);
-					if ( esc_attr( get_the_author_meta( $taxonomy_slug_prefixed, $current_user_id ) ) == "yes" ) {
-						// Only add to array if it wasn't already there ($current_user_permissions values are always prefixed)
+					if ( 'yes' === esc_attr( get_the_author_meta( $taxonomy_slug_prefixed, $current_user_id ) ) ) {
+						// Only add to array if it wasn't already there ($current_user_permissions values are always prefixed).
 						if ( ! in_array( $taxonomy_slug_prefixed, $current_user_permissions, true ) ) {
 							array_push( $current_user_permissions, $taxonomy_slug_prefixed );
 						}
 					}
 				}
 			}
-			// Debug 
-			/*
-			foreach($current_user_permissions as $current_user_permission) {
-				echo('User permission: '.$current_user_permission.'<br />');
-			}
-			*/
 
-			$user_defined_restricted_message  = esc_attr( get_option( 'simple_restrict_setting_one' ) );
-			$user_defined_restricted_message  = get_option( 'simple_restrict_setting_one' );
 			$simple_restrict_setting_redirect = get_option( 'simple_restrict_setting_redirect' );
-			// If the user's permissions don't match any of the page's permissions
+			// If the user's permissions don't match any of the page's permissions.
 			if ( ! array_intersect( $current_page_permissions_prefixed, $current_user_permissions ) ) {
-				// Redirect to login or display message
+				// Redirect to login or display message.
 				if ( isset( $simple_restrict_setting_redirect ) && ( $simple_restrict_setting_redirect == 1 ) ) {
-					header( "Location: /wp-login.php?redirect_to=" . $_SERVER['REQUEST_URI'] );
+					header( 'Location: /wp-login.php?redirect_to=' . $_SERVER['REQUEST_URI'] ); // phpcs:ignore
 					exit;
 				} else {
 					add_filter( 'the_content', array( $this, 'display_message' ) );
 				}
 			} else {
-				// Otherwise show the regular content because it is restricted but the user has the permission
-				// (Note that $content is empty so below does nothing, and our script simply ends without a restriction)
+				// Otherwise show the regular content because it is restricted but the user has the permission.
+				// (Note that $content is empty so below does nothing, and our script simply ends without a restriction).
 				return $content;
 			}
 		}
@@ -211,33 +190,33 @@ class Simple_Restrict_Public {
 	/**
 	 * Restrict content of specific page(s) for REST API
 	 *
-	 * @param  string  $response  The response object.
-	 * @param  string  $post      The post object.
-	 * @param  string  $request   The request object.
+	 * @param  string $response  The response object.
+	 * @param  object $post      The post object.
+	 * @param  string $request   The request object.
 	 *
 	 * @since    1.0.0
 	 */
 	public function rest_restrict( $response, $post, $request ) {
-		// If this is an admin page, don't restrict content
+		// If this is an admin page, don't restrict content.
 		if ( is_admin() ) {
 			return $response;
 		}
 
-		// We must prefix 'simple-restrict' to all the user metas (to not conflict with WordPress existing metas)
-		$current_page_permissions = array();  // Page permissions are user-defined, so we prefix them manually in next array
-		$postID                   = $post->ID;
-		// Create an array of the current page's permissions
-		$page_terms_list = wp_get_post_terms( $postID, 'simple-restrict-permission', array( 'fields' => 'all' ) );
+		// We must prefix 'simple-restrict' to all the user metas (to not conflict with WordPress existing metas).
+		$current_page_permissions = array();  // Page permissions are user-defined, so we prefix them manually in next array.
+		$post_id                  = $post->ID;
+		// Create an array of the current page's permissions.
+		$page_terms_list = wp_get_post_terms( $post_id, 'simple-restrict-permission', array( 'fields' => 'all' ) );
 		foreach ( $page_terms_list as $current_term ) {
 			if ( ! in_array( $current_term->slug, $current_page_permissions, true ) ) {
 				array_push( $current_page_permissions, $current_term->slug );
 			}
 		}
 
-		// If the page has no permissions required, show the content and don't bother checking user
+		// If the page has no permissions required, show the content and don't bother checking user.
 		if ( empty( $current_page_permissions ) ) {
 			return $response;
-			// Otherwise check the user to see if it's permissions match the page's permissions
+			// Otherwise check the user to see if it's permissions match the page's permissions.
 		} else {
 			// Check if the user has the required permissions.
 			if ( current_user_can( 'edit_posts' ) ) {
@@ -245,11 +224,95 @@ class Simple_Restrict_Public {
 			}
 
 			// Send a 403 error if the content is restricted.
-			//@todo: What can be done here is to check the request for the user's permissions and then send a 403 error if the user doesn't have the required permissions.
-			// @todo: else return the content
+			// @todo: What can be done here is to check the request for the user's permissions and then send a 403 error if the user doesn't have the required permissions.
+			// @todo: else return the content.
 			wp_send_json_error( __( 'Sorry, this content is restricted', 'simple-restrict' ), 403 );
 
 			return $response;
+		}
+	}
+
+	/**
+	 * Get all restricted pages
+	 *
+	 * @since    1.2.8
+	 */
+	public function get_all_restricted_pages() {
+		$terms                = get_terms( 'simple-restrict-permission' );
+		$restricted_pages     = array();
+		$restricted_pages_ids = array();
+		$args                 = array(
+			'post_type'      => 'page',
+			'posts_per_page' => -1,
+			'tax_query'      => array(
+				array(
+					'taxonomy' => 'simple-restrict-permission',
+					'field'    => 'slug',
+					'terms'    => wp_list_pluck( $terms, 'slug' ),
+				),
+			),
+		);
+		$restricted_pages     = get_posts( $args );
+		$current_user_id      = 0;
+		if ( is_user_logged_in() ) {
+			$current_user_id = get_current_user_id();
+		}
+		if ( ! empty( $restricted_pages ) ) {
+			foreach ( $restricted_pages as $page ) {
+				// Check if the user is logged in and has the required permissions.
+				if ( 0 !== $current_user_id ) {
+					// Get the page's permissions.
+					$terms = wp_get_post_terms( $page->ID, 'simple-restrict-permission', array( 'fields' => 'all' ) );
+					foreach ( $terms as $taxonomy_object ) {
+						$taxonomy_slug          = $taxonomy_object->slug;
+						$taxonomy_slug_prefixed = 'simple-restrict-' . $taxonomy_slug;
+						// If the user has the required permissions, allow access.
+						if ( 'yes' === esc_attr( get_the_author_meta( $taxonomy_slug_prefixed, $current_user_id ) ) ) {
+							$access = true;
+						} else {
+							$access = false;
+						}
+					}
+				} else { // User not logged in, so restrict access.
+					$access = false;
+				}
+
+				if ( ! $access ) {
+					$restricted_pages_ids[] = $page->ID;
+				}
+			}
+		}
+
+		return $restricted_pages_ids;
+	}
+
+	/**
+	 * Restrict search results
+	 *
+	 * @param  object $query  The query object.
+	 *
+	 * @since    1.2.8
+	 */
+	public function posts_args_search( $query ) {
+
+		if ( ! $query->is_search ) {
+			return;
+		}
+		// Check if it's a pages query.
+		$post_type_query = $query->get( 'post_type' );
+		if ( '' !== $post_type_query && ( ( is_array( $post_type_query ) && ! in_array( 'page', $post_type_query, true ) ) || ( is_string( $post_type_query ) && 'page' !== $post_type_query ) ) ) {
+			return;
+		}
+
+		// Check if it's a search query or a REST request.
+		if ( ( ! is_admin() ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST && isset( $query->query_vars['s'] ) ) ) {
+			// Remove the filter to avoid infinite loop.
+			remove_filter( 'pre_get_posts', array( $this, 'posts_args_search' ), 90 );
+			$excluded_post_ids = $this->get_all_restricted_pages();
+			// Add the filter back, as the request for the restricted pages is done.
+			add_filter( 'pre_get_posts', array( $this, 'posts_args_search' ), 90, 1 );
+			$query->set( 'post__not_in', $excluded_post_ids );
+
 		}
 	}
 }

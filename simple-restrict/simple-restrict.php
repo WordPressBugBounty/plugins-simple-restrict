@@ -15,7 +15,7 @@
  * @wordpress-plugin
  * Plugin Name:       Simple Restrict
  * Description:       Restrict pages based on permissions assigned to pages and granted in user profiles.
- * Version:           1.2.7
+ * Version:           1.2.8
  * Author:            WPChill
  * Author URI:        https://wpchill.com
  * License:           GPLv2 or later
@@ -23,6 +23,12 @@
  * Text Domain:       simple-restrict
  * Tested up to:      6.6
  * Domain Path:       /languages
+ *
+ *
+ *  Original Plugin URI:    http://www.awakensolutions.com/simple-restrict/
+ *  Original Author URI:    http://www.awakensolutions.com
+ *  Original Author:        Awaken Solutions Inc.
+ *  Awaken Solutions Inc. has transferred ownership to WPChill on: 10th of February, 2024.
  */
 
 // If this file is called directly, abort.

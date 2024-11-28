@@ -2,8 +2,8 @@
 Contributors: wpchill, awakensolutions
 Tags: restrict, hide, permission, authorization, restrict pages, hide pages, restrict content, hide content, user permission, page permission, user permissions, page
 Requires at least: 3.4
-Tested up to: 6.6
-Stable tag: 1.2.7
+Tested up to: 6.7
+Stable tag: 1.2.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -138,3 +138,6 @@ This plugin was released in English and French, and anyone can add additional tr
 
 = 1.2.7 - 14.02.2024 =
 Fixed: Security issue
+
+= 1.2.8 - 28.11.2024 =
+Fixed: Security issue ( Thanks to Francesco Carlucci )
