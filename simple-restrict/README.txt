@@ -2,7 +2,7 @@
 Contributors: wpchill, awakensolutions
 Tags: restrict, hide, permission, authorization, restrict pages, hide pages, restrict content, hide content, user permission, page permission, user permissions, page
 Requires at least: 3.4
-Tested up to: 6.7
+Tested up to: 6.8
 Stable tag: 1.2.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
