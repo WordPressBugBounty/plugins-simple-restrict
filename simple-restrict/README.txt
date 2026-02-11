@@ -2,7 +2,7 @@
 Contributors: wpchill, awakensolutions
 Tags: restrict, hide, permission, authorization, restrict pages, hide pages, restrict content, hide content, user permission, page permission, user permissions, page
 Requires at least: 3.4
-Tested up to: 6.8
+Tested up to: 6.9
 Stable tag: 1.2.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -74,6 +74,9 @@ The plugin is [on GitHub](https://github.com/GitHubGreg/SimpleRestrict), feel fr
 
 This plugin was released in English and French, and anyone can add additional translations [from here](https://translate.wordpress.org/projects/wp-plugins/simple-restrict).
 
+= Where do I report security bugs found in this plugin? =
+
+Please report security bugs found in the source code of the Simple Restrict plugin through the [Patchstack Vulnerability Disclosure  Program](https://patchstack.com/database/vdp/9e5fbef7-10f5-4464-b09a-3e6a83b0b170). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin."
 
 == Screenshots ==
 
