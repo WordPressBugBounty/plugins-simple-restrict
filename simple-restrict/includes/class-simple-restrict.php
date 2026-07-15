@@ -70,7 +70,7 @@ class Simple_Restrict {
 	public function __construct() {
 
 		$this->simple_restrict = 'simple-restrict';
-		$this->version         = '1.2.8';
+		$this->version         = '1.2.9';
 
 		$this->load_dependencies();
 		$this->set_locale();

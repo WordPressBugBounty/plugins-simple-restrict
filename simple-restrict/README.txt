@@ -3,7 +3,7 @@ Contributors: wpchill, awakensolutions
 Tags: restrict, hide, permission, authorization, restrict pages, hide pages, restrict content, hide content, user permission, page permission, user permissions, page
 Requires at least: 3.4
 Tested up to: 6.9
-Stable tag: 1.2.8
+Stable tag: 1.2.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -96,6 +96,9 @@ Please report security bugs found in the source code of the Simple Restrict plug
 
 
 == Changelog ==
+
+= 1.2.9 =
+Fixed: Incorrect Authorization (CWE-863) in the REST API restriction check, which allowed a Contributor-level user to bypass page permissions enforced on the frontend ( Thanks to Shikhali Jamalzade )
 
 = 1.0.0 =
 * Initial release

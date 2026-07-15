@@ -15,13 +15,13 @@
  * @wordpress-plugin
  * Plugin Name:       Simple Restrict
  * Description:       Restrict pages based on permissions assigned to pages and granted in user profiles.
- * Version:           1.2.8
+ * Version:           1.2.9
  * Author:            WPChill
  * Author URI:        https://wpchill.com
  * License:           GPLv2 or later
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       simple-restrict
- * Tested up to:      6.9
+ * Tested up to:      7.0
  * Domain Path:       /languages
  *
  *

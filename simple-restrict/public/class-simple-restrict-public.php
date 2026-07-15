@@ -203,33 +203,58 @@ class Simple_Restrict_Public {
 		}
 
 		// We must prefix 'simple-restrict' to all the user metas (to not conflict with WordPress existing metas).
-		$current_page_permissions = array();  // Page permissions are user-defined, so we prefix them manually in next array.
-		$post_id                  = $post->ID;
+		$current_user_permissions          = array();  // User permissions will be prefixed by default.
+		$current_page_permissions          = array();  // Page permissions are user-defined, so we prefix them manually in next array.
+		$current_page_permissions_prefixed = array();  // This array will prefix each of the page permissions.
+
+		$post_id = $post->ID;
+
+		if ( current_user_can( 'edit_post', $post_id ) ) {
+			return $response;
+		}
+
 		// Create an array of the current page's permissions.
 		$page_terms_list = wp_get_post_terms( $post_id, 'simple-restrict-permission', array( 'fields' => 'all' ) );
 		foreach ( $page_terms_list as $current_term ) {
 			if ( ! in_array( $current_term->slug, $current_page_permissions, true ) ) {
+				$current_term_slug_prefixed = 'simple-restrict-' . $current_term->slug;
 				array_push( $current_page_permissions, $current_term->slug );
+				array_push( $current_page_permissions_prefixed, $current_term_slug_prefixed );
 			}
 		}
 
 		// If the page has no permissions required, show the content and don't bother checking user.
 		if ( empty( $current_page_permissions ) ) {
 			return $response;
-			// Otherwise check the user to see if it's permissions match the page's permissions.
-		} else {
-			// Check if the user has the required permissions.
-			if ( current_user_can( 'edit_posts' ) ) {
-				return $response;
+		}
+
+		// Build the current user's permissions from their profile meta, using the same taxonomy-based
+		// rules the frontend enforces in restrict_content(). Using a generic capability check here
+		// (e.g. current_user_can( 'edit_posts' )) would let any Contributor-level user bypass the
+		// page's assigned permissions over the REST API.
+		$current_user_id = get_current_user_id();
+		// Only populate user permissions if this is a registered user, otherwise leave permissions array empty.
+		if ( 0 !== $current_user_id && ! empty( $this->taxonomy_terms_object_array ) ) {
+			foreach ( $this->taxonomy_terms_object_array as $taxonomy_object ) {
+				$taxonomy_slug_prefixed = 'simple-restrict-' . $taxonomy_object->slug;
+				if ( 'yes' === esc_attr( get_the_author_meta( $taxonomy_slug_prefixed, $current_user_id ) ) ) {
+					// Only add to array if it wasn't already there ($current_user_permissions values are always prefixed).
+					if ( ! in_array( $taxonomy_slug_prefixed, $current_user_permissions, true ) ) {
+						array_push( $current_user_permissions, $taxonomy_slug_prefixed );
+					}
+				}
 			}
+		}
 
-			// Send a 403 error if the content is restricted.
-			// @todo: What can be done here is to check the request for the user's permissions and then send a 403 error if the user doesn't have the required permissions.
-			// @todo: else return the content.
-			wp_send_json_error( __( 'Sorry, this content is restricted', 'simple-restrict' ), 403 );
-
+		// If the user has at least one of the page's required permissions, return the content.
+		if ( array_intersect( $current_page_permissions_prefixed, $current_user_permissions ) ) {
 			return $response;
 		}
+
+		// Otherwise the content is restricted for this user: send a 403 error.
+		wp_send_json_error( __( 'Sorry, this content is restricted', 'simple-restrict' ), 403 );
+
+		return $response;
 	}
 
 	/**
