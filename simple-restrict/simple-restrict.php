@@ -15,7 +15,7 @@
  * @wordpress-plugin
  * Plugin Name:       Simple Restrict
  * Description:       Restrict pages based on permissions assigned to pages and granted in user profiles.
- * Version:           1.2.9
+ * Version:           1.2.10
  * Author:            WPChill
  * Author URI:        https://wpchill.com
  * License:           GPLv2 or later

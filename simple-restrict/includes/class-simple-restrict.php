@@ -70,7 +70,7 @@ class Simple_Restrict {
 	public function __construct() {
 
 		$this->simple_restrict = 'simple-restrict';
-		$this->version         = '1.2.9';
+		$this->version         = '1.2.10';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -193,8 +193,11 @@ class Simple_Restrict {
 		// Define variables (like $this->generic_restricted_message) for other functions (plugins_loaded is called very early)
 		$this->loader->add_action( 'plugins_loaded', $plugin_public, 'define_initial_variables' );
 
-		// Check permissions and restrict content if necessary (call with wp hook instead of init hook so we can access post ID for all pages including homepage)
+		// Redirect restricted single pages to login (if enabled), then restrict content per post.
 		$this->loader->add_action( 'wp', $plugin_public, 'restrict_content' );
+		$this->loader->add_filter( 'the_content', $plugin_public, 'filter_content', 999 );
+		$this->loader->add_filter( 'the_content_feed', $plugin_public, 'filter_content', 999 );
+		$this->loader->add_filter( 'get_the_excerpt', $plugin_public, 'filter_excerpt', 999, 2 );
 
 		$this->loader->add_action( 'init', $plugin_public, 'get_taxonomy_terms_object_array' );
 
